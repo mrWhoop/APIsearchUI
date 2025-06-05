@@ -7,4 +7,9 @@
   align-items: center;
   gap: 1rem;
   margin-top: 1rem;
+  width: 100%;
+}
+
+.result-wrapper > * {
+  flex: 1;
 }
