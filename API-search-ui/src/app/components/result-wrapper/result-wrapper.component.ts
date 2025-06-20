@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import {Component, OnInit, signal} from '@angular/core';
 import {ResultComponent} from '../result/result.component';
+
 
 @Component({
   selector: 'app-result-wrapper',
@@ -9,6 +10,6 @@ import {ResultComponent} from '../result/result.component';
   templateUrl: './result-wrapper.component.html',
   styleUrl: './result-wrapper.component.css'
 })
-export class ResultWrapperComponent {
-
+export class ResultWrapperComponent{
+  viewSignal = signal('evaluation')
 }

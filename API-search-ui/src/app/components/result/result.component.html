@@ -1,4 +1,21 @@
-<div class="result-item">
-  <div>{{apiResponse()}}</div>
-  <div><button>pick solution</button></div>
-</div>
+@if (viewSignal() === 'evaluation'){
+  <div class="result-item">
+    @for (searchItem of searchItems(); track $index){
+        <h3><a href="{{searchItem.docs}}">{{searchItem.name}}</a></h3>
+        <p>{{searchItem.description}}</p>
+        <p>{{searchItem.category}}</p>
+    }
+   <div><button>pick solution</button></div>
+  </div>
+}
+@else {
+  <div class="search-wrapper">
+    <div class="search-item">
+      @for (searchItem of searchItems(); track $index){
+        <h3><a href="{{searchItem.docs}}">{{searchItem.name}}</a></h3>
+        <p>{{searchItem.description}}</p>
+        <p>{{searchItem.category}}</p>
+      }
+    </div>
+  </div>
+}
