@@ -13,3 +13,23 @@
   border-radius: 32px;
   font-size: 24px;
 }
+
+.search-button{
+  margin-top: 1rem;
+  margin-left: 0.5rem;
+  margin-bottom: 1rem;
+  padding: 10px;
+  border: 2px solid #333;
+  border-radius: 32px;
+  font-size: 24px;
+}
+
+.clear-button{
+  margin-top: 1rem;
+  margin-left: 0.5rem;
+  margin-bottom: 1rem;
+  padding: 10px;
+  border: 2px solid #333;
+  border-radius: 32px;
+  font-size: 24px;
+}

@@ -1,8 +1,8 @@
-import {Component, inject, Input, OnInit, signal} from '@angular/core';
+import {Component, inject, Input, OnDestroy, OnInit, signal} from '@angular/core';
 import type { Signal, WritableSignal } from '@angular/core';
 import {SearchService} from '../../services/search.service';
 import {result} from '../../model/result.type';
-import {catchError} from 'rxjs';
+import {catchError, ObservableInput, Subject, takeUntil} from 'rxjs';
 
 @Component({
   selector: 'app-result',
@@ -13,23 +13,32 @@ import {catchError} from 'rxjs';
 
 // on init samo za testiranje
 
-export class ResultComponent implements OnInit {
-  searchService = inject(SearchService)
+export class ResultComponent implements OnInit, OnDestroy {
+  // searchService = inject(SearchService)
+  private destroy$ = new Subject<void>();
+  results: result[] = [];
   searchItems = signal<Array<result>>([]);
   @Input() viewSignal!: Signal<string>;
 
+  constructor(private searchService: SearchService) {}
+
   ngOnInit() {
-    this.searchService.searchAPI('none')
-      .pipe(
-        catchError((err) => {
-          console.log(err);
-          throw err;
-        })
-    ).subscribe((result) => {
-      this.searchItems.set(result);
-    })
+
     if (this.viewSignal == null) {
       this.viewSignal = signal('search');
+      this.searchService.searchResults$
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(results => {
+          this.results = results;
+          console.log('Received search results:', results);
+          this.searchItems.set(results);
+        });
     }
   }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
 }
