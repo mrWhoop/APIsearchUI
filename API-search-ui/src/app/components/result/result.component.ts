@@ -14,11 +14,11 @@ import {catchError, ObservableInput, Subject, takeUntil} from 'rxjs';
 // on init samo za testiranje
 
 export class ResultComponent implements OnInit, OnDestroy {
-  // searchService = inject(SearchService)
   private destroy$ = new Subject<void>();
   results: result[] = [];
-  searchItems = signal<Array<result>>([]);
+  @Input() searchItems = signal<Array<result>>([]);
   @Input() viewSignal!: Signal<string>;
+  @Input() selectedAI: Signal<string> | undefined;
 
   constructor(private searchService: SearchService) {}
 

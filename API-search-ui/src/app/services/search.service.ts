@@ -44,7 +44,7 @@ export class SearchService {
         this.loadingSubject.next(true);
         this.errorSubject.next(null);
       }),
-      switchMap(query => this.searchAPI(query))
+      switchMap((query) => this.searchAPI(query))
     ).subscribe();
   }
 
@@ -98,6 +98,10 @@ export class SearchService {
   // Get current results synchronously
   getCurrentResults(): result[] {
     return this.searchResultsSubject.value;
+  }
+
+  getServiceName(): string {
+    return 'SearchService';
   }
 
 }

@@ -1,50 +1,59 @@
-import { Component } from '@angular/core';
-import {Subject, takeUntil} from 'rxjs';
+import {Component, OnInit} from '@angular/core';
+import {filter, Subject, takeUntil} from 'rxjs';
 import {result} from '../../model/result.type';
 import {SearchService} from '../../services/search.service';
 import {FormsModule} from '@angular/forms';
 import {NgIf} from '@angular/common';
+import {NavigationEnd, Router} from '@angular/router';
+import {EvaluationService} from '../../services/evaluation.service';
 
 @Component({
   selector: 'app-search',
   imports: [
-    FormsModule,
-    NgIf
+    FormsModule
   ],
   templateUrl: './search.component.html',
   styleUrl: './search.component.css'
 })
-export class SearchComponent {
+export class SearchComponent implements OnInit {
   private destroy$ = new Subject<void>();
+  private currentService: any;
 
   searchQuery: string = '';
   loading: boolean = false;
   error: string | null = null;
   results: result[] = [];
 
-  constructor(private searchService: SearchService) {}
+  constructor(
+    private router: Router,
+    private searchService: SearchService,
+    private evaluationService: EvaluationService
+  ) {}
 
-  ngOnInit(): void {
-    // Subscribe to loading state
-    this.searchService.loading$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(loading => {
-        this.loading = loading;
-      });
+  ngOnInit() {
+    this.setServiceBasedOnURL();
 
-    // Subscribe to error state
-    this.searchService.error$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(error => {
-        this.error = error;
+    this.router.events
+      .pipe(
+        filter(event => event instanceof NavigationEnd),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((event: NavigationEnd) => {
+        this.setServiceBasedOnURL();
       });
+  }
 
-    // Subscribe to search results (for count display)
-    this.searchService.searchResults$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(results => {
-        this.results = results;
-      });
+  private setServiceBasedOnURL() {
+    const currentUrl = this.router.url;
+
+    if (currentUrl.includes('/evaluation')) {
+      this.currentService = this.evaluationService;
+      console.log('I am in evaluation', currentUrl);
+    }
+    else{
+      this.currentService = this.searchService;
+      console.log('I am in search', currentUrl);
+    }
   }
 
   onSearchInput(event: any): void {
@@ -52,21 +61,21 @@ export class SearchComponent {
     this.searchQuery = query;
 
     if (query.trim()) {
-      this.searchService.search(this.searchQuery);
+      this.currentService.search(this.searchQuery);
     } else {
-      this.searchService.clearResults();
+      this.currentService.clearResults();
     }
   }
 
   performSearch(): void {
     if (this.searchQuery.trim()) {
-      this.searchService.search(this.searchQuery);
+      this.currentService.search(this.searchQuery);
     }
   }
 
   clearSearch(): void {
     this.searchQuery = '';
-    this.searchService.clearResults();
+    this.currentService.clearResults();
   }
 
   ngOnDestroy(): void {
