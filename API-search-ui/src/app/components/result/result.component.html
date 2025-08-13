@@ -1,7 +1,7 @@
 @if (viewSignal() === 'evaluation'){
   <div class="result-item">
     @for (searchItem of searchItems(); track $index){
-        <h3><a href="{{searchItem.docs}}">{{searchItem.name}}</a></h3>
+        <h3><a href="{{searchItem.docs}}" target="_blank">{{searchItem.name}}</a></h3>
         <p>{{searchItem.description}}</p>
         <p>{{searchItem.category}}</p>
     }
@@ -12,7 +12,7 @@
   <div class="search-wrapper">
     <div class="search-item">
       @for (searchItem of searchItems(); track $index){
-        <h3><a href="{{searchItem.docs}}">{{searchItem.name}}</a></h3>
+        <h3><a href="{{searchItem.docs}}" target="_blank">{{searchItem.name}}</a></h3>
         <p>{{searchItem.description}}</p>
         <p>{{searchItem.category}}</p>
       }
