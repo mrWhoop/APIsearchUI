@@ -3,7 +3,9 @@
     @for (searchItem of searchItems(); track $index){
         <h3><a href="{{searchItem.docs}}" target="_blank">{{searchItem.name}}</a></h3>
         <p>{{searchItem.description}}</p>
-        <p>{{searchItem.category}}</p>
+        <p>Category: {{searchItem.category}} <br><br>
+          HTTPS: {{searchItem.https}} | Popularity: {{searchItem.popularity}} | Latency: {{searchItem.latency}} | Reliability: {{searchItem.reliability}} <br>
+          Service level: {{searchItem.service_level}} | CORS: {{searchItem.cors}} | Authentication: {{searchItem.authentication}}</p>
     }
    <div><button>pick solution</button></div>
   </div>
@@ -14,7 +16,7 @@
       @for (searchItem of searchItems(); track $index){
         <h3><a href="{{searchItem.docs}}" target="_blank">{{searchItem.name}}</a></h3>
         <p>{{searchItem.description}}</p>
-        <p>{{searchItem.category}}</p>
+        <p>Category: {{searchItem.category}}</p>
       }
     </div>
   </div>

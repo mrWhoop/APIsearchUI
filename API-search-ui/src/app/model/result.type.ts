@@ -3,4 +3,12 @@ export type result = {
   category: string,
   description: string,
   docs: string,
+
+  https: boolean,
+  popularity: number,
+  latency: number,
+  reliability: number,
+  service_level: number,
+  cors: string,
+  authentication: string
 }
