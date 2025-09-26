@@ -87,7 +87,7 @@ export class EvaluationService {
   }
 
   getGPTsearch(query: string): Observable<any> {
-    let params = new HttpParams().set("q", query).set("ai", "GPTmeta"); // GPT | GPTmeta | GPTprompt
+    let params = new HttpParams().set("q", query).set("ai", "GPTdesc"); // GPT | GPTmeta | GPTprompt | GPTdesc
     let rez = this.http.get<{results: result[]}>(`${this.baseUrl}/search`, { params }).pipe(
       tap(response => {
         this.searchResultsSubjectGPT.next(response.results);
@@ -130,7 +130,7 @@ export class EvaluationService {
   }
 
   getGeminiSearch(query: string): Observable<any> {
-    let params = new HttpParams().set("q", query).set("ai", "Geminimeta"); // Gemini | Geminimeta | Geminiprompt
+    let params = new HttpParams().set("q", query).set("ai", "Geminidesc"); // Gemini | Geminimeta | Geminiprompt | Geminidesc
     let rez = this.http.get<{results: result[]}>(`${this.baseUrl}/search`, { params }).pipe(
       tap(response => {
         this.searchResultsSubjectGemini.next(response.results);
