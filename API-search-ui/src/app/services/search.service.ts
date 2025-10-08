@@ -24,6 +24,12 @@ export class SearchService {
   private searchResultsSubject = new BehaviorSubject<result[]>([]);
   public searchResults$ = this.searchResultsSubject.asObservable();
 
+  private GPTsummarySubject = new BehaviorSubject<string>('');
+  public GPTsummary$ = this.GPTsummarySubject.asObservable();
+
+  private GeminiSummarySubject = new BehaviorSubject<string>('');
+  public GeminiSummary$ = this.GeminiSummarySubject.asObservable();
+
   private loadingSubject = new BehaviorSubject<boolean>(false);
   public loading$ = this.loadingSubject.asObservable();
 
@@ -66,31 +72,38 @@ export class SearchService {
     let params = new HttpParams().set("q", query);
 
 
-    let rez = this.http.get<{results: result[]}>(`${this.baseUrl}/search`, { params })
-      .pipe(
-        tap(response => {
-          this.searchResultsSubject.next(response.results);
-          this.loadingSubject.next(false);
-          this.errorSubject.next(null);
-        }),
-        map(response => response.results),
-        catchError(error => {
-          this.loadingSubject.next(false);
-          this.errorSubject.next('Search failed. Please try again.');
-          this.searchResultsSubject.next([]);
-          console.error('Search error:', error);
-          return of([]);
-        })
-      );
-
-      console.log(rez)
-
+    let rez = this.http.get<{
+      GPTsummary: string;
+      GeminiSummary: string;
+      results: result[];
+      }>(`${this.baseUrl}/search`, { params })
+        .pipe(
+          tap(response => {
+            this.searchResultsSubject.next(response.results);
+            this.GPTsummarySubject.next(response.GPTsummary || '');
+            this.GeminiSummarySubject.next(response.GeminiSummary || '');
+            this.loadingSubject.next(false);
+            this.errorSubject.next(null);
+          }),
+          map(response => response.results),
+          catchError(error => {
+            this.loadingSubject.next(false);
+            this.errorSubject.next('Search failed. Please try again.');
+            this.searchResultsSubject.next([]);
+            this.GPTsummarySubject.next('');
+            this.GeminiSummarySubject.next('');
+            console.error('Search error:', error);
+            return of([]);
+          })
+        );
       return rez;
   }
 
   // Clear search results
   clearResults(): void {
     this.searchResultsSubject.next([]);
+    this.GPTsummarySubject.next('');
+    this.GeminiSummarySubject.next('');
     this.loadingSubject.next(false);
     this.errorSubject.next(null);
   }

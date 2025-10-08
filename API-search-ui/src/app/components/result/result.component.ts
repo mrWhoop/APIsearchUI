@@ -16,7 +16,10 @@ import {catchError, ObservableInput, Subject, takeUntil} from 'rxjs';
 export class ResultComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   results: result[] = [];
+
   @Input() searchItems = signal<Array<result>>([]);
+  @Input() GPTsummary = signal('');
+  @Input() GeminiSummary = signal('');
   @Input() viewSignal!: Signal<string>;
   @Input() selectedAI: Signal<string> | undefined;
 
@@ -32,6 +35,17 @@ export class ResultComponent implements OnInit, OnDestroy {
           this.results = results;
           console.log('Received search results:', results);
           this.searchItems.set(results);
+        });
+      this.searchService.GPTsummary$
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(summary => {
+          this.GPTsummary.set(summary);
+        });
+
+      this.searchService.GeminiSummary$
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(summary => {
+          this.GeminiSummary.set(summary);
         });
     }
   }

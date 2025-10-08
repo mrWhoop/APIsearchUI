@@ -13,12 +13,18 @@
 }
 @else {
   <div class="search-wrapper">
+    <div class="result-item" [innerHTML]="GeminiSummary()"></div>
     <div class="search-item">
       @for (searchItem of searchItems(); track $index){
         <h3><a href="{{searchItem.docs}}" target="_blank">{{searchItem.name}}</a></h3>
         <p>{{searchItem.description}}</p>
-        <p>Category: {{searchItem.category}}</p>
+        <p>Category: {{searchItem.category}} <br><br>
+          HTTPS: {{searchItem.https}} | Popularity: {{searchItem.popularity}} | Latency: {{searchItem.latency}} | Reliability: {{searchItem.reliability}} <br>
+          Service level: {{searchItem.service_level}} | CORS: {{searchItem.cors}} | Authentication: {{searchItem.authentication}} <br>
+          Type: {{searchItem.type}}
+        </p>
       }
     </div>
+    <div class="result-item" [innerHTML]="GeminiSummary()"></div>
   </div>
 }
