@@ -13,8 +13,8 @@
 }
 @else {
   <div class="search-wrapper">
-    <div class="result-item" [innerHTML]="GeminiSummary()"></div>
-    <div class="search-item">
+    <div class="search-item" ><img src="images/gpt.png" style="height:50px; width:auto;"><div [innerHTML]="GPTsummary()"></div></div>
+    <div class="search-item" style="border-left: 2px  solid #333; border-right: 2px  solid #333;">
       @for (searchItem of searchItems(); track $index){
         <h3><a href="{{searchItem.docs}}" target="_blank">{{searchItem.name}}</a></h3>
         <p>{{searchItem.description}}</p>
@@ -25,6 +25,6 @@
         </p>
       }
     </div>
-    <div class="result-item" [innerHTML]="GeminiSummary()"></div>
+    <div class="search-item"><img src="images/gemini.png" style="height:50px; width:auto;"><div [innerHTML]="GeminiSummary()"></div></div>
   </div>
 }

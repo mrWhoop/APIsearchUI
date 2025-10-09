@@ -3,10 +3,13 @@ import type { Signal, WritableSignal } from '@angular/core';
 import {SearchService} from '../../services/search.service';
 import {result} from '../../model/result.type';
 import {catchError, ObservableInput, Subject, takeUntil} from 'rxjs';
+import {NgOptimizedImage} from '@angular/common';
 
 @Component({
   selector: 'app-result',
-  imports: [],
+  imports: [
+    NgOptimizedImage
+  ],
   templateUrl: './result.component.html',
   styleUrl: './result.component.css'
 })
