@@ -3,9 +3,8 @@
     @for (searchItem of searchItems(); track $index){
         <h3><a href="{{searchItem.docs}}" target="_blank">{{searchItem.name}}</a></h3>
         <p>{{searchItem.description}}</p>
-        <p>Category: {{searchItem.category}} <br><br>
-          HTTPS: {{searchItem.https}} | Popularity: {{searchItem.popularity}} | Latency: {{searchItem.latency}} | Reliability: {{searchItem.reliability}} <br>
-          Service level: {{searchItem.service_level}} | CORS: {{searchItem.cors}} | Authentication: {{searchItem.authentication}} <br>
+        <p>Category: {{searchItem.category}} <br>
+          HTTPS: {{searchItem.https}} | CORS: {{searchItem.cors}} | Authentication: {{searchItem.authentication}} <br>
           Type: {{searchItem.type}}
         </p>
     }
@@ -13,18 +12,17 @@
 }
 @else {
   <div class="search-wrapper">
-    <div class="search-item" ><img src="images/gpt.png" style="height:50px; width:auto;"><div [innerHTML]="GPTsummary()"></div></div>
+    <div class="search-item" style="position: relative;"><img src="images/gpt.png" style="height:50px; width:auto; position: absolute; left:45%;"><div [innerHTML]="GPTsummary()" style="padding-top: 50px"></div></div>
     <div class="search-item" style="border-left: 2px  solid #333; border-right: 2px  solid #333;">
       @for (searchItem of searchItems(); track $index){
         <h3><a href="{{searchItem.docs}}" target="_blank">{{searchItem.name}}</a></h3>
         <p>{{searchItem.description}}</p>
-        <p>Category: {{searchItem.category}} <br><br>
-          HTTPS: {{searchItem.https}} | Popularity: {{searchItem.popularity}} | Latency: {{searchItem.latency}} | Reliability: {{searchItem.reliability}} <br>
-          Service level: {{searchItem.service_level}} | CORS: {{searchItem.cors}} | Authentication: {{searchItem.authentication}} <br>
+        <p>Category: {{searchItem.category}} <br>
+          HTTPS: {{searchItem.https}} | CORS: {{searchItem.cors}} | Authentication: {{searchItem.authentication}} <br>
           Type: {{searchItem.type}}
         </p>
       }
     </div>
-    <div class="search-item"><img src="images/gemini.png" style="height:50px; width:auto;"><div [innerHTML]="GeminiSummary()"></div></div>
+    <div class="search-item" style="position: relative;"><img src="images/gemini.png" style="height:50px; width:auto; position: absolute; left:30%;"><div [innerHTML]="GeminiSummary()" style="padding-top: 50px"></div></div>
   </div>
 }
