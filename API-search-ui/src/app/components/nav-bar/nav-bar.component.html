@@ -1,10 +1,29 @@
-<header>
-  <nav>
-    <span routerLink="/search">API SEARCH</span>
-    <ul>
-      <li class="list-item" routerLink="/evaluation">evaluation</li>
-      <li class="list-separator">|</li>
-      <li class="list-item" routerLink="/">search APP</li>
+
+<header class="app-header">
+  <nav class="navbar">
+    <span class="brand" routerLink="/search">
+      API SEARCH
+    </span>
+
+    <div class="navbar-search">
+      <app-search></app-search>
+    </div>
+
+    <ul class="nav-links">
+      <li>
+        <a routerLink="/evaluation" routerLinkActive="active">
+          Evaluation
+        </a>
+      </li>
+      <li>
+        <a
+          routerLink="/"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          Search App
+        </a>
+      </li>
     </ul>
   </nav>
 </header>

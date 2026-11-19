@@ -1,5 +1,17 @@
 <div class="result-wrapper">
-  <app-result [viewSignal]="viewSignal" [searchItems]="searchItemsGPT"></app-result>
-  <app-result [viewSignal]="viewSignal" [searchItems]="searchItemsMeiliSearch"></app-result>
-  <app-result [viewSignal]="viewSignal" [searchItems]="searchItemsGemini"></app-result>
+  @for (component of resultComponents; track component.name) {
+    <app-result
+      [viewSignal]="viewSignal"
+      [searchItems]="component.items"
+      [resultComponent]="component.name">
+    </app-result>
+  }
+</div>
+<div class="submit-container">
+  <button
+    type="button"
+    class="submit-button"
+    (click)="submitAllEvaluations()">
+    Submit
+  </button>
 </div>

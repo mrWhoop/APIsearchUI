@@ -1,4 +1,6 @@
 export type result = {
+  id: string;
+
   name: string,
   category: string,
   description: string,

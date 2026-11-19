@@ -1,18 +1,188 @@
 @if (viewSignal() === 'evaluation'){
   <div class="result-item">
     @for (searchItem of searchItems(); track $index){
-        <h3><a href="{{searchItem.docs}}" target="_blank">{{searchItem.name}}</a></h3>
-        <p>{{searchItem.description}}</p>
-        <p>Category: {{searchItem.category}} <br>
-          HTTPS: {{searchItem.https}} | CORS: {{searchItem.cors}} | Authentication: {{searchItem.authentication}} <br>
-          Type: {{searchItem.type}}
-        </p>
+      <div class="result-header">
+        <h3>
+          <a href="{{searchItem.docs}}" target="_blank">
+            {{searchItem.name}}
+          </a>
+        </h3>
+
+        <input
+          type="checkbox"
+          [checked]="isSelected(searchItem)"
+          (change)="toggleSelection(searchItem)"
+        >
+
+        <button
+          type="button"
+          (click)="markResult(searchItem)"
+          [class.marked]="isMarked(searchItem)"
+        >
+          {{ isMarked(searchItem) ? 'Marked' : 'Mark' }}
+        </button>
+
+      </div>
+      <p>{{searchItem.description}}</p>
+      <p>Category: {{searchItem.category}} <br>
+        HTTPS: {{searchItem.https}} | CORS: {{searchItem.cors}} | Authentication: {{searchItem.authentication}} <br>
+        Type: {{searchItem.type}}
+      </p>
     }
+    <!--<button type="button" [disabled]="submitted" (click)="submitSelected()">{{ submitted ? 'Done' : 'Submit' }}</button-->
   </div>
 }
-@else {
+@else if (viewSignal() === 'search') {
   <div class="search-wrapper">
-    <div class="search-item" style="position: relative;"><img src="images/gpt.png" style="height:50px; width:auto; position: absolute; left:45%;"><div [innerHTML]="GPTsummary()" style="padding-top: 50px"></div></div>
+
+    <div class="search-item" style="position: relative;">
+      @if (GPTonLeft()) {
+<!--        <img src="images/gpt.png" style="height:50px; width:auto; position:absolute; left:45%;">-->
+        <div [innerHTML]="GPTsummary()" style="padding-top:50px"></div>
+
+        <div class="summary-grades">
+          <label>
+            Berljivost
+          </label>
+            <select
+              [value]="GPTgrades().fluency"
+              (change)="updateGPTGrade('fluency', +$any($event.target).value)">
+              <option value="-1">Not graded</option>
+              @for (grade of [
+                { value: 0, description: 'Odgovor je nerazumljiv ali neberljiv.' },
+                { value: 1, description: 'Odgovor je težko berljiv in slabo strukturiran.' },
+                { value: 2, description: 'Odgovor je razumljiv, vendar ima opazne jezikovne ali oblikovne pomanjkljivosti.' },
+                { value: 3, description: 'Odgovor je tekoč in dobro strukturiran z manjšimi pomanjkljivostmi.' },
+                { value: 4, description: 'Odgovor je tekoč, slovnično pravilen in pregledno oblikovan.' }
+              ]; track grade) {
+                <option [value]="grade.value">
+                  {{ grade.value }} – {{ grade.description }}
+                </option>
+              }
+            </select>
+
+          <br>
+          <br>
+          <label>
+            Utemeljenost
+          </label>
+            <select
+              [value]="GPTgrades().groundness"
+              (change)="updateGPTGrade('groundness', +$any($event.target).value)">
+              <option value="-1">Not graded</option>
+              @for (grade of [
+                { value: 0, description: 'Skoraj vse trditve so nepodprte.' },
+                { value: 1, description: 'Večina trditev ni podprta.' },
+                { value: 2, description: 'Del trditev je podprt, prisotne so pomembne nepodprte navedbe.' },
+                { value: 3, description: 'Skoraj vse trditve so podprte, prisotne so manjše netočnosti.' },
+                { value: 4, description: 'Vse trditve so podprte z informacijami iz dokumentov.' }
+              ]; track grade) {
+                <option [value]="grade.value">
+                  {{ grade.value }} – {{ grade.description }}
+                </option>
+              }
+            </select>
+
+          <br>
+          <br>
+          <label>
+            Verodostojnost
+          </label>
+            <select
+              [value]="GPTgrades().faithfulness"
+              (change)="updateGPTGrade('faithfulness', +$any($event.target).value)">
+              <option value="-1">Not graded</option>
+              @for (grade of [
+                { value: 0, description: 'Interpretacija in zaključki so večinoma napačni.' },
+                { value: 1, description: 'Prisotne so številne napačne interpretacije.' },
+                { value: 2, description: 'Interpretacija je delno pravilna, vendar vsebuje pomembne napačne zaključke.' },
+                { value: 3, description: 'Interpretacija in zaključki so večinoma pravilni.' },
+                { value: 4, description: 'Dokumenti in poizvedba so pravilno interpretirani, zaključki so ustrezni.' }
+              ]; track grade) {
+                <option [value]="grade.value">
+                  {{ grade.value }} – {{ grade.description }}
+                </option>
+              }
+            </select>
+
+        </div>
+        <div class="submit-container">
+          <button [disabled]="GPTsubmitted" class="submit-button" (click)="sendComapareEval('GPT')"> {{ GPTsubmitted ? 'Done' : 'Submit' }} </button>
+        </div>
+      } @else {
+<!--        <img src="images/gemini.png" style="height:50px; width:auto; position:absolute; left:30%;">-->
+        <div [innerHTML]="GeminiSummary()" style="padding-top:50px"></div>
+
+        <div class="summary-grades">
+          <label>
+            Berljivost
+          </label>
+            <select
+              [value]="GeminiGrades().fluency"
+              (change)="updateGeminiGrade('fluency', +$any($event.target).value)">
+              <option value="-1">Not graded</option>
+              @for (grade of [
+                { value: 0, description: 'Odgovor je nerazumljiv ali neberljiv.' },
+                { value: 1, description: 'Odgovor je težko berljiv in slabo strukturiran.' },
+                { value: 2, description: 'Odgovor je razumljiv, vendar ima opazne jezikovne ali oblikovne pomanjkljivosti.' },
+                { value: 3, description: 'Odgovor je tekoč in dobro strukturiran z manjšimi pomanjkljivostmi.' },
+                { value: 4, description: 'Odgovor je tekoč, slovnično pravilen in pregledno oblikovan.' }
+              ]; track grade) {
+                <option [value]="grade.value">
+                  {{ grade.value }} – {{ grade.description }}
+                </option>
+              }
+            </select>
+          <br>
+          <br>
+          <label>
+            Utemeljenost
+          </label>
+            <select
+              [value]="GeminiGrades().groundness"
+              (change)="updateGeminiGrade('groundness', +$any($event.target).value)">
+              <option value="-1">Not graded</option>
+              @for (grade of [
+                { value: 0, description: 'Skoraj vse trditve so nepodprte.' },
+                { value: 1, description: 'Večina trditev ni podprta.' },
+                { value: 2, description: 'Del trditev je podprt, prisotne so pomembne nepodprte navedbe.' },
+                { value: 3, description: 'Skoraj vse trditve so podprte, prisotne so manjše netočnosti.' },
+                { value: 4, description: 'Vse trditve so podprte z informacijami iz dokumentov.' }
+              ]; track grade) {
+                <option [value]="grade.value">
+                  {{ grade.value }} – {{ grade.description }}
+                </option>
+              }
+            </select>
+          <br>
+          <br>
+          <label>
+            Verodostojnost
+          </label>
+            <select
+              [value]="GeminiGrades().faithfulness"
+              (change)="updateGeminiGrade('faithfulness', +$any($event.target).value)">
+              <option value="-1">Not graded</option>
+              @for (grade of [
+                { value: 0, description: 'Interpretacija in zaključki so večinoma napačni.' },
+                { value: 1, description: 'Prisotne so številne napačne interpretacije.' },
+                { value: 2, description: 'Interpretacija je delno pravilna, vendar vsebuje pomembne napačne zaključke.' },
+                { value: 3, description: 'Interpretacija in zaključki so večinoma pravilni.' },
+                { value: 4, description: 'Dokumenti in poizvedba so pravilno interpretirani, zaključki so ustrezni.' }
+              ]; track grade) {
+                <option [value]="grade.value">
+                  {{ grade.value }} – {{ grade.description }}
+                </option>
+              }
+            </select>
+
+        </div>
+        <div class="submit-container">
+          <button [disabled]="GeminiSubmitted" class="submit-button" (click)="sendComapareEval('Gemini')"> {{ GeminiSubmitted ? 'Done' : 'Submit' }} </button>
+        </div>
+      }
+    </div>
+
     <div class="search-item" style="border-left: 2px  solid #333; border-right: 2px  solid #333;">
       @for (searchItem of searchItems(); track $index){
         <h3><a href="{{searchItem.docs}}" target="_blank">{{searchItem.name}}</a></h3>
@@ -23,6 +193,171 @@
         </p>
       }
     </div>
-    <div class="search-item" style="position: relative;"><img src="images/gemini.png" style="height:50px; width:auto; position: absolute; left:30%;"><div [innerHTML]="GeminiSummary()" style="padding-top: 50px"></div></div>
+    <div class="search-item" style="position: relative;">
+      @if (GPTonLeft()) {
+<!--        <img src="images/gemini.png" style="height:50px; width:auto; position:absolute; left:30%;">-->
+        <div [innerHTML]="GeminiSummary()" style="padding-top:50px"></div>
+
+        <div class="summary-grades">
+          <label>
+            Berljivost
+          </label>
+            <select
+              [value]="GeminiGrades().fluency"
+              (change)="updateGeminiGrade('fluency', +$any($event.target).value)">
+              <option value="-1">Not graded</option>
+              @for (grade of [
+                { value: 0, description: 'Odgovor je nerazumljiv ali neberljiv.' },
+                { value: 1, description: 'Odgovor je težko berljiv in slabo strukturiran.' },
+                { value: 2, description: 'Odgovor je razumljiv, vendar ima opazne jezikovne ali oblikovne pomanjkljivosti.' },
+                { value: 3, description: 'Odgovor je tekoč in dobro strukturiran z manjšimi pomanjkljivostmi.' },
+                { value: 4, description: 'Odgovor je tekoč, slovnično pravilen in pregledno oblikovan.' }
+              ]; track grade) {
+                <option [value]="grade.value">
+                  {{ grade.value }} – {{ grade.description }}
+                </option>
+              }
+            </select>
+          <br>
+          <br>
+          <label>
+            Utemeljenost
+          </label>
+            <select
+              [value]="GeminiGrades().groundness"
+              (change)="updateGeminiGrade('groundness', +$any($event.target).value)">
+              <option value="-1">Not graded</option>
+              @for (grade of [
+                { value: 0, description: 'Skoraj vse trditve so nepodprte.' },
+                { value: 1, description: 'Večina trditev ni podprta.' },
+                { value: 2, description: 'Del trditev je podprt, prisotne so pomembne nepodprte navedbe.' },
+                { value: 3, description: 'Skoraj vse trditve so podprte, prisotne so manjše netočnosti.' },
+                { value: 4, description: 'Vse trditve so podprte z informacijami iz dokumentov.' }
+              ]; track grade) {
+                <option [value]="grade.value">
+                  {{ grade.value }} – {{ grade.description }}
+                </option>
+              }
+            </select>
+
+          <br>
+          <br>
+          <label>
+            Verodostojnost
+          </label>
+            <select
+              [value]="GeminiGrades().faithfulness"
+              (change)="updateGeminiGrade('faithfulness', +$any($event.target).value)">
+              <option value="-1">Not graded</option>
+              @for (grade of [
+                { value: 0, description: 'Interpretacija in zaključki so večinoma napačni.' },
+                { value: 1, description: 'Prisotne so številne napačne interpretacije.' },
+                { value: 2, description: 'Interpretacija je delno pravilna, vendar vsebuje pomembne napačne zaključke.' },
+                { value: 3, description: 'Interpretacija in zaključki so večinoma pravilni.' },
+                { value: 4, description: 'Dokumenti in poizvedba so pravilno interpretirani, zaključki so ustrezni.' }
+              ]; track grade) {
+                <option [value]="grade.value">
+                  {{ grade.value }} – {{ grade.description }}
+                </option>
+              }
+            </select>
+        </div>
+        <div class="submit-container">
+          <button [disabled]="GeminiSubmitted" class="submit-button" (click)="sendComapareEval('Gemini')"> {{ GeminiSubmitted ? 'Done' : 'Submit' }} </button>
+        </div>
+      } @else {
+<!--        <img src="images/gpt.png" style="height:50px; width:auto; position:absolute; left:45%;">-->
+        <div [innerHTML]="GPTsummary()" style="padding-top:50px"></div>
+
+        <div class="summary-grades">
+          <label>
+            Berljivost
+          </label>
+          <select
+            [value]="GPTgrades().fluency"
+            (change)="updateGPTGrade('fluency', +$any($event.target).value)">
+            <option value="-1">Not graded</option>
+            @for (grade of [
+              { value: 0, description: 'Odgovor je nerazumljiv ali neberljiv.' },
+              { value: 1, description: 'Odgovor je težko berljiv in slabo strukturiran.' },
+              { value: 2, description: 'Odgovor je razumljiv, vendar ima opazne jezikovne ali oblikovne pomanjkljivosti.' },
+              { value: 3, description: 'Odgovor je tekoč in dobro strukturiran z manjšimi pomanjkljivostmi.' },
+              { value: 4, description: 'Odgovor je tekoč, slovnično pravilen in pregledno oblikovan.' }
+            ]; track grade) {
+              <option [value]="grade.value">
+                {{ grade.value }} – {{ grade.description }}
+              </option>
+            }
+          </select>
+          <br>
+          <br>
+          <label>
+            Utemeljenost
+          </label>
+          <select
+            [value]="GPTgrades().groundness"
+            (change)="updateGPTGrade('groundness', +$any($event.target).value)">
+            <option value="-1">Not graded</option>
+            @for (grade of [
+              { value: 0, description: 'Skoraj vse trditve so nepodprte.' },
+              { value: 1, description: 'Večina trditev ni podprta.' },
+              { value: 2, description: 'Del trditev je podprt, prisotne so pomembne nepodprte navedbe.' },
+              { value: 3, description: 'Skoraj vse trditve so podprte, prisotne so manjše netočnosti.' },
+              { value: 4, description: 'Vse trditve so podprte z informacijami iz dokumentov.' }
+            ]; track grade) {
+              <option [value]="grade.value">
+                {{ grade.value }} – {{ grade.description }}
+              </option>
+            }
+          </select>
+          <br>
+          <br>
+          <label>
+            Verodostojnost
+          </label>
+          <select
+            [value]="GPTgrades().faithfulness"
+            (change)="updateGPTGrade('faithfulness', +$any($event.target).value)">
+            <option value="-1">Not graded</option>
+            @for (grade of [
+              { value: 0, description: 'Interpretacija in zaključki so večinoma napačni.' },
+              { value: 1, description: 'Prisotne so številne napačne interpretacije.' },
+              { value: 2, description: 'Interpretacija je delno pravilna, vendar vsebuje pomembne napačne zaključke.' },
+              { value: 3, description: 'Interpretacija in zaključki so večinoma pravilni.' },
+              { value: 4, description: 'Dokumenti in poizvedba so pravilno interpretirani, zaključki so ustrezni.' }
+            ]; track grade) {
+              <option [value]="grade.value">
+                {{ grade.value }} – {{ grade.description }}
+              </option>
+            }
+          </select>
+        </div>
+        <div class="submit-container">
+          <button [disabled]="GPTsubmitted" class="submit-button" (click)="sendComapareEval('GPT')"> {{ GPTsubmitted ? 'Done' : 'Submit' }} </button>
+        </div>
+      }
+    </div>
+  </div>
+}
+@else{
+  <div class="search-wrapper">
+    <div class="search-item" style="position: relative;">
+      <img src="images/gpt.png" style="height:50px; width:auto; position:absolute; left:45%;">
+      <div [innerHTML]="GPTsummary()" style="padding-top:50px"></div>
+    </div>
+    <div class="search-item" style="border-left: 2px  solid #333; border-right: 2px  solid #333;">
+      @for (searchItem of searchItems(); track $index){
+        <h3><a href="{{searchItem.docs}}" target="_blank">{{searchItem.name}}</a></h3>
+        <p>{{searchItem.description}}</p>
+        <p>Category: {{searchItem.category}} <br>
+          HTTPS: {{searchItem.https}} | CORS: {{searchItem.cors}} | Authentication: {{searchItem.authentication}} <br>
+          Type: {{searchItem.type}}
+        </p>
+      }
+    </div>
+    <div class="search-item" style="position: relative;">
+      <img src="images/gemini.png" style="height:50px; width:auto; position:absolute; left:30%;">
+      <div [innerHTML]="GeminiSummary()" style="padding-top:50px"></div>
+    </div>
   </div>
 }
